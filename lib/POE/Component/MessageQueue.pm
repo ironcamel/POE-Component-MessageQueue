@@ -18,7 +18,7 @@
 package POE::Component::MessageQueue;
 use Moose;
 
-our $VERSION = '0.2.13';
+# VERSION
 
 use POE 0.38;
 use POE::Component::Server::Stomp;
@@ -510,7 +510,7 @@ __END__
 
 =head1 NAME
 
-POE::Component::MessageQueue - A POE message queue that uses STOMP for its communication protocol
+POE::Component::MessageQueue - A STOMP based message queue server
 
 =head1 USAGE
 

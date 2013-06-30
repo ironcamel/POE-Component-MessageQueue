@@ -1,3 +1,0 @@
-
-This is a Perl message queue based on POE that uses STOMP as its communication protocol.
-
