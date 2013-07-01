@@ -113,21 +113,19 @@ sub clone
 	return $self->meta->clone_object($self);
 }
 
-sub from_stomp_frame
-{
+sub from_stomp_frame {
 	my ($class, $frame) = @_;
+	my $persistent = lc($frame->headers->{persistent} || '');
 	my $msg = $class->new(
 		id          => $frame->headers->{'message-id'},
 		destination => $frame->headers->{destination},
-		persistent  => $frame->headers->{persistent} eq 'true',
+		persistent  => ($persistent eq 'true') || ($persistent eq '1'),
 		body        => $frame->body,
 	);
-	if (!$msg->persistent and my $after = $frame->headers->{'expire-after'})
-	{
+	if (!$msg->persistent and my $after = $frame->headers->{'expire-after'}) {
 		$msg->expire_at(time + $after);
 	}
-	if (my $after = $frame->headers->{'deliver-after'})
-	{
+	if (my $after = $frame->headers->{'deliver-after'}) {
 		$msg->deliver_at(time + $after);
 	}
 	return $msg;
