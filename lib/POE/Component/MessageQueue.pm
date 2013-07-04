@@ -73,18 +73,28 @@ has storage => (
 );
 
 has clients => (
-	metaclass => 'Collection::Hash',
 	isa       => 'HashRef[POE::Component::MessageQueue::Client]',
 	default   => sub { {} },
-	provides  => {
-		'get'    => 'get_client',
-		'delete' => 'remove_client',
-		'set'    => 'set_client',
-		'keys'   => 'all_client_ids',
+	traits  => ['Hash'],
+	handles => {
+		'get_client'     => 'get',
+		'remove_client'  => 'delete',
+		'set_client'     => 'set',
+		'all_client_ids' => 'keys',
 	}
 );
 
-has shutdown_count => (metaclass => 'Counter');
+has shutdown_count => (
+	is      => 'ro',
+	isa     => 'Num',
+	default => 0,
+	traits  => ['Counter'],
+	handles => {
+		'inc_shutdown_count'   => 'inc',
+		'dec_shutdown_count'   => 'dec',
+		'reset_shutdown_count' => 'reset',
+	}
+);
 
 has message_class => (
 	is      => 'ro',
@@ -127,24 +137,24 @@ before remove_client => sub {
 };
 	
 has destinations => (
-	metaclass => 'Collection::Hash',
-	isa       => 'HashRef[POE::Component::MessageQueue::Destination]',
-	default   => sub { {} },
-	provides  => {
-		'get'    => 'get_destination',
-		'set'    => 'set_destination',
-		'values' => 'all_destinations',
+	isa     => 'HashRef[POE::Component::MessageQueue::Destination]',
+	default => sub { {} },
+	traits  => ['Hash'],
+	handles => {
+		'get_destination'  => 'get',
+		'set_destination'  => 'set',
+		'all_destinations' => 'values',
 	}
 );
 
 has owners => (
-	metaclass => 'Collection::Hash',
-	isa       => 'HashRef[POE::Component::MessageQueue::Subscription]',
-	default   => sub { {} },
-	provides  => {
-		'get'    => 'get_owner',
-		'set'    => 'set_owner',
-		'delete' => 'delete_owner',
+	isa     => 'HashRef[POE::Component::MessageQueue::Subscription]',
+	default => sub { {} },
+	traits  => ['Hash'],
+	handles => {
+		'get_owner'    => 'get',
+		'set_owner'    => 'set',
+		'delete_owner' => 'delete',
 	},
 );
 

@@ -17,20 +17,19 @@
 
 package POE::Component::MessageQueue::Client;
 use Moose;
-use MooseX::AttributeHelpers;
 use POE::Component::MessageQueue::Subscription;
 use POE::Kernel;
 
 has subscriptions => (
-	metaclass => 'Collection::Hash',
 	is => 'ro',
 	isa => 'HashRef[POE::Component::MessageQueue::Subscription]',
 	default => sub { {} },
-	provides => {
-		'set'    => 'set_subscription',
-		'get'    => 'get_subscription',
-		'values' => 'all_subscriptions',
-		'delete' => 'delete_subscription',
+	traits  => ['Hash'],
+	handles => {
+		'set_subscription'    => 'set',
+		'get_subscription'    => 'get',
+		'all_subscriptions'   => 'values',
+		'delete_subscription' => 'delete',
 	},
 );
 

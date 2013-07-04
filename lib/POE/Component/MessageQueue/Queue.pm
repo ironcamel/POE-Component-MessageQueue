@@ -20,7 +20,6 @@ package POE::Component::MessageQueue::Queue;
 use POE;
 use POE::Session;
 use Moose;
-use MooseX::AttributeHelpers;
 
 with qw(POE::Component::MessageQueue::Destination);
 
@@ -32,14 +31,14 @@ flag 'shutting_down';
 sub stash {
 	my $n = $_[0];
 	has $n => (
-		metaclass => 'Collection::Hash',
-		is        => 'rw',
-		isa       => 'HashRef',
-    default   => sub { {} },
-		provides  => {
-			'set'    => "set_$n",
-			'delete' => "del_$n",
-			'keys'   => "${n}_keys",
+		is      => 'rw',
+		isa     => 'HashRef',
+		default => sub { {} },
+		traits  => ['Hash'],
+		handles => {
+			"set_$n"    => 'set',
+			"del_$n"    => 'delete',
+			"${n}_keys" => 'keys',
 		}
 	);
 }

@@ -36,7 +36,6 @@ sub cmp
 
 package POE::Component::MessageQueue::Storage::Complex;
 use Moose;
-use MooseX::AttributeHelpers;
 with qw(POE::Component::MessageQueue::Storage::Double);
 
 use POE;
@@ -63,13 +62,13 @@ has alias => (
 );
 
 has front_size => (
-	metaclass => 'Number',
-	is        => 'rw',
-	isa       => 'Int',
-	default   => 0,
-	provides  => {
-		'add' => 'more_front',
-		'sub' => 'less_front',
+	is      => 'rw',
+	isa     => 'Int',
+	default => 0,
+	traits  => ['Number'],
+	handles => {
+		'more_front' => 'add',
+		'less_front' => 'sub',
 	},
 );
 
@@ -80,30 +79,30 @@ has front_max => (
 );
 
 has front_expirations => (
-	metaclass => 'Collection::Hash',
-	is        => 'ro', 
-	isa       => 'HashRef[Num]',
-	default   => sub { {} },
-	provides  => {
-		'set'    => 'expire_from_front',
-		'delete' => 'delete_front_expiration',
-		'clear'  => 'clear_front_expirations',
-		'count'  => 'count_front_expirations',
-		'kv'     => 'front_expiration_pairs',
+	is      => 'ro', 
+	isa     => 'HashRef[Num]',
+	default => sub { {} },
+	traits  => ['Hash'],
+	handles => {
+		'expire_from_front'       => 'set',
+		'delete_front_expiration' => 'delete',
+		'clear_front_expirations' => 'clear',
+		'count_front_expirations' => 'count',
+		'front_expiration_pairs'  => 'kv',
 	},	
 );
 
 has nonpersistent_expirations => (
-	metaclass => 'Collection::Hash',
 	is => 'ro',
 	isa => 'HashRef',
 	default => sub { {} },
-	provides => {
-		'set'    => 'expire_nonpersistent',
-		'delete' => 'delete_nonpersistent_expiration',
-		'clear'  => 'clear_nonpersistent_expirations',
-		'count'  => 'count_nonpersistent_expirations',
-		'kv'     => 'nonpersistent_expiration_pairs',
+	traits  => ['Hash'],
+	handles => {
+		'expire_nonpersistent'            => 'set',
+		'delete_nonpersistent_expiration' => 'delete',
+		'clear_nonpersistent_expirations' => 'clear',
+		'count_nonpersistent_expirations' => 'count',
+		'nonpersistent_expiration_pairs'  => 'kv',
 	},
 );
 
@@ -115,15 +114,15 @@ sub count_expirations
 }
 
 has idle_hash => (
-	metaclass => 'Collection::Hash',
 	is => 'ro',
 	isa => 'HashRef',
 	default   => sub { {} },
-	provides  => {
-		'set'    => '_hashset_idle',
-		'get'    => 'get_idle',
-		'delete' => 'delete_idle',
-		'clear'  => 'clear_idle',
+	traits  => ['Hash'],
+	handles => {
+		'_hashset_idle' => 'set',
+		'get_idle'      => 'get',
+		'delete_idle'   => 'delete',
+		'clear_idle'    => 'clear',
 	},
 );
 

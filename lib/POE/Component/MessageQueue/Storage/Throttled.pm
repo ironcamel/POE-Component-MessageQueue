@@ -17,7 +17,6 @@
 
 package POE::Component::MessageQueue::Storage::Throttled;
 use Moose;
-use MooseX::AttributeHelpers;
 use POE;
 
 with qw(POE::Component::MessageQueue::Storage::Double);
@@ -28,8 +27,29 @@ has throttle_max => (
 	default  => 2,
 );
 
-has sent => (metaclass => 'Counter');
-has throttle_count => (metaclass => 'Counter');
+has sent => (
+	is      => 'ro',
+	isa     => 'Num',
+	default => 0,
+	traits  => ['Counter'],
+	handles => {
+		'inc_sent'   => 'inc',
+		'dec_sent'   => 'dec',
+		'reset_sent' => 'reset',
+	}
+);
+
+has throttle_count => (
+	is      => 'ro',
+	isa     => 'Num',
+	default => 0,
+	traits  => ['Counter'],
+	handles => {
+		'inc_throttle_count'   => 'inc',
+		'dec_throttle_count'   => 'dec',
+		'reset_throttle_count' => 'reset',
+	}
+);
 
 has shutdown_callback => (
 	is        => 'rw',

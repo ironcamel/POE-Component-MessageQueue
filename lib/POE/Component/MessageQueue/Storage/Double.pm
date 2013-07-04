@@ -17,7 +17,6 @@
 
 package POE::Component::MessageQueue::Storage::Double;
 use Moose::Role;
-use MooseX::AttributeHelpers;
 use MooseX::MultiInitArg;
 
 # These guys just call a method on both front and back stores and have a
@@ -64,16 +63,16 @@ has back => (
 # Any true value for a given ID means the message is in the front store.
 # (value may be useful data, like message size)
 has front_info => (
-	metaclass => 'Collection::Hash',
 	is => 'ro',
 	isa => 'HashRef',
 	default => sub { {} },
-	provides => {
-		'exists' => 'in_front',
-		'get'    => 'get_front',
-		'set'    => 'set_front',
- 		'clear'  => 'clear_front',
-		'delete' => 'delete_front',
+	traits  => ['Hash'],
+	handles => {
+		'in_front'     => 'exists',
+		'get_front'    => 'get',
+		'set_front'    => 'set',
+		'clear_front'  => 'clear',
+		'delete_front' => 'delete',
 	},
 );
 

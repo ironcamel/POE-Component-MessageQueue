@@ -17,7 +17,6 @@
 
 package POE::Component::MessageQueue::IDGenerator::SimpleInt;
 use Moose;
-use MooseX::AttributeHelpers;
 with qw(POE::Component::MessageQueue::IDGenerator);
 
 has 'filename' => (
@@ -27,8 +26,15 @@ has 'filename' => (
 );
 
 has 'last_id' => (
-	metaclass => 'Counter',
-	is        => 'rw',
+	is      => 'rw',
+	isa     => 'Num',
+	default => 0,
+	traits  => ['Counter'],
+	handles => {
+		'inc_last_id'   => 'inc',
+		'dec_last_id'   => 'dec',
+		'reset_last_id' => 'reset',
+	}
 );
 
 sub BUILD
