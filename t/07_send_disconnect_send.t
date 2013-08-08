@@ -4,8 +4,14 @@ use warnings;
 use lib 't/lib';
 use POE::Component::MessageQueue::Test::Stomp;
 use POE::Component::MessageQueue::Test::MQ;
-use Test::More tests => 8;
+use Test::More;
 use Test::Exception;
+
+if ($^O eq 'MSWin32') {
+    plan skip_all => 'Tests hang on Windows :(';
+} else {
+    plan tests => 8;
+}
 
 # Once upon a time, we had a bug where the MQ would crash if you connected,
 # sent some messages, received them, disconnected, reconnected, and sent 

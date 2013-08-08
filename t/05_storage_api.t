@@ -1,6 +1,15 @@
 use strict;
 use warnings;
-use Test::More tests => 126;
+use Test::More;
+
+BEGIN {
+    if ($^O eq 'MSWin32') {
+        plan skip_all => 'Tests hang on Windows :(';
+    } else {
+        plan tests => 126;
+    }
+}
+
 use File::Path;
 use POE;
 use POE::Session;

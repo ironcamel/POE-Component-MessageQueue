@@ -9,7 +9,13 @@ use POE::Component::MessageQueue::Test::EngineMaker;
 use File::Path;
 use IO::Dir qw(DIR_UNLINK);
 use Test::Exception;
-use Test::More tests => 10;
+use Test::More;
+
+if ($^O eq 'MSWin32') {
+    plan skip_all => 'Tests hang on Windows :(';
+} else {
+    plan tests => 10;
+}
 
 # 1) Start MQ with Filesystem
 # 2) send some messages
