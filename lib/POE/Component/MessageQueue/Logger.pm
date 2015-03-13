@@ -17,6 +17,9 @@
 
 package POE::Component::MessageQueue::Logger;
 use Moose;
+
+# VERSION
+
 use POE::Kernel;
 
 my $LEVELS = {

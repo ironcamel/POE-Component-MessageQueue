@@ -19,6 +19,8 @@ package POE::Component::MessageQueue::Storage::Double;
 use Moose::Role;
 use MooseX::MultiInitArg;
 
+# VERSION
+
 # These guys just call a method on both front and back stores and have a
 # simple no-arg completion callback.  No reason to write them all!
 foreach my $method (qw(empty disown_destination disown_all)) {
@@ -82,7 +84,7 @@ after 'set_logger' => sub {
 	$self->back->set_logger($logger);
 };
 
-sub in_back 
+sub in_back
 {
 	my ($self, $id) = @_;
 	return 1 unless $self->in_front($id);
@@ -128,7 +130,7 @@ sub remove
 {
 	my ($self, $aref, $callback) = @_;
 	$self->_doboth(
-		$aref, 
+		$aref,
 		sub {
 			my ($ids, $callback) = @_;
 			$self->delete_front($ids);
@@ -177,7 +179,7 @@ sub get_all
 		$self->back->get_all(sub {
 			$messages{$_->id} = $_ foreach @{$_[0]};
 			@_ = ([values %messages]);
-			goto $callback;	
+			goto $callback;
 		});
 	});
 }
@@ -190,7 +192,7 @@ sub get_oldest
 		$self->back->get_oldest(sub {
 			my $b = $_[0];
 			@_ = (
-				($f && $b) ? 
+				($f && $b) ?
 				($f->timestamp < $b->timestamp ? $f : $b) :
 				($f || $b)
 			);
@@ -239,12 +241,12 @@ __END__
 
 POE::Component::MessageQueue::Storage::Double -- Stores composed of two other
 stores.
- 
+
 =head1 DESCRIPTION
 
 Refactor mercilessly, as they say.  They also say don't repeat yourself.  This
-module contains functionality for any store that is a composition of two 
-stores.  At least Throttled and Complex share this trait, and it doesn't make 
+module contains functionality for any store that is a composition of two
+stores.  At least Throttled and Complex share this trait, and it doesn't make
 any sense to duplicate code between them.
 
 =head1 CONSTRUCTOR PARAMETERS

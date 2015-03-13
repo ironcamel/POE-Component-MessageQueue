@@ -18,6 +18,8 @@
 package POE::Component::MessageQueue::Destination;
 use Moose::Role;
 
+# VERSION
+
 has parent => (
 	is       => 'ro',
 	required => 1,

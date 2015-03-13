@@ -18,6 +18,8 @@
 package POE::Component::MessageQueue::Topic;
 use Moose;
 
+# VERSION
+
 with qw(POE::Component::MessageQueue::Destination);
 __PACKAGE__->meta->make_immutable();
 

@@ -18,6 +18,8 @@
 package POE::Component::MessageQueue::Subscription;
 use Moose;
 
+# VERSION
+
 has client => (
 	is       => 'ro',
 	isa      => 'POE::Component::MessageQueue::Client',

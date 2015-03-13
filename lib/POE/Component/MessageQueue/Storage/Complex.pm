@@ -16,6 +16,9 @@
 #
 
 package POE::Component::MessageQueue::Storage::Complex::IdleElement;
+
+# VERSION
+
 use Heap::Elem;
 use base qw(Heap::Elem);
 BEGIN {eval q(use Time::HiRes qw(time))}
@@ -36,6 +39,9 @@ sub cmp
 
 package POE::Component::MessageQueue::Storage::Complex;
 use Moose;
+
+# VERSION
+
 with qw(POE::Component::MessageQueue::Storage::Double);
 
 use POE;
@@ -74,12 +80,12 @@ has front_size => (
 
 has front_max => (
 	is       => 'ro',
-	isa      => 'Int', 
+	isa      => 'Int',
 	required => 1,
 );
 
 has front_expirations => (
-	is      => 'ro', 
+	is      => 'ro',
 	isa     => 'HashRef[Num]',
 	default => sub { {} },
 	traits  => ['Hash'],
@@ -89,7 +95,7 @@ has front_expirations => (
 		'clear_front_expirations' => 'clear',
 		'count_front_expirations' => 'count',
 		'front_expiration_pairs'  => 'kv',
-	},	
+	},
 );
 
 has nonpersistent_expirations => (
@@ -106,7 +112,7 @@ has nonpersistent_expirations => (
 	},
 );
 
-sub count_expirations 
+sub count_expirations
 {
 	my $self = $_[0];
 	return $self->count_nonpersistent_expirations +
@@ -138,7 +144,7 @@ sub set_idle
 {
 	my ($self, @ids) = @_;
 
-	my %idles = map {($_ => 
+	my %idles = map {($_ =>
 		POE::Component::MessageQueue::Storage::Complex::IdleElement->new($_)
 	)} @ids;
 
@@ -155,7 +161,7 @@ after clear_idle => sub {$_[0]->reset_idle_heap()};
 
 has shutting_down => (
 	is       => 'rw',
-	default  => 0, 
+	default  => 0,
 );
 
 after remove => sub {
@@ -203,7 +209,7 @@ sub _activity
 {
 	my ($self, $arg) = @_;
 	my $aref = (ref $arg eq 'ARRAY' ? $arg : [$arg]);
-	
+
 	my $time = time();
 	foreach my $elem (grep {$_} $self->get_idle(@$aref))
 	{
@@ -214,7 +220,7 @@ sub _activity
 	}
 }
 
-sub BUILD 
+sub BUILD
 {
 	my $self = shift;
 	POE::Session->create(
@@ -261,11 +267,11 @@ sub store
 		$self->front->get(\@bump, sub {
 			my $now = time();
 			$self->front->remove(\@bump);
-			$self->back->store($_) foreach 
-				grep { $need_persist{$_->id} } 
-				grep { !$_->has_expiration or $now < $_->expire_at } 
+			$self->back->store($_) foreach
+				grep { $need_persist{$_->id} }
+				grep { !$_->has_expiration or $now < $_->expire_at }
 				grep { $_->persistent || $_->has_expiration }
-				@{ $_[0] }; 
+				@{ $_[0] };
 		});
 	}
 
@@ -335,7 +341,7 @@ sub storage_shutdown
 
 		my @messages = grep {$_->persistent && !$self->in_back($_)}
 		               @$message_aref;
-		
+
 		$self->log(info => 'Moving all messages into backstore.');
 		$self->back->store($_) foreach @messages;
 		$self->front->empty(sub {

@@ -19,6 +19,9 @@
 package POE::Component::MessageQueue::Statistics::Publish::YAML;
 use strict;
 use warnings;
+
+# VERSION
+
 use base qw(POE::Component::MessageQueue::Statistics::Publish);
 use Best [ qw(YAML::Syck YAML) ], qw(Dump);
 use File::Temp;
@@ -65,7 +68,7 @@ POE::Component::MessageQueue::Statistics::Publish::YAML - Publish Statistics In 
 	my $stats   = POE::Component::MessageQueue::Statistics->new();
 
 	my $publish = POE::Component::MessageQueue::Statistics::Publish::YAML->new(
-		output => \*STDOUT, 
+		output => \*STDOUT,
 		statistics => $stats
 	);
 	$publish->publish();

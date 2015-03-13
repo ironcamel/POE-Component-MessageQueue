@@ -17,6 +17,9 @@
 
 package POE::Component::MessageQueue::Storage::Remote::Server;
 use Moose;
+
+# VERSION
+
 use POE;
 use POE::Filter::Reference;
 use POE::Component::Server::TCP;
@@ -61,7 +64,7 @@ sub BUILD
 						callback => $callback_id,
 						args     => [@_]
 					});
-					$poe_kernel->post($self->session_id, 'shutdown') 
+					$poe_kernel->post($self->session_id, 'shutdown')
 						if ($method eq 'storage_shutdown');
 				});
 			}

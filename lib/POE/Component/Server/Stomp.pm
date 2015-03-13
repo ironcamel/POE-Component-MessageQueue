@@ -16,6 +16,9 @@
 #
 
 package POE::Component::Server::Stomp;
+use strict;
+
+# VERSION
 
 use POE::Session;
 use POE::Component::Server::TCP;
@@ -23,10 +26,6 @@ use POE::Filter::Stomp;
 use IO::String;
 use Net::Stomp::Frame;
 use Carp qw(croak);
-use vars qw($VERSION);
-use strict;
-
-$VERSION = '0.2.3';
 
 sub new
 {
@@ -55,7 +54,7 @@ sub new
 	my $client_error        = delete $args->{ClientError};
 
 	# A closure?  In Perl!?  Hrm...
-	my $client_input = sub 
+	my $client_input = sub
 	{
 		my ($kernel, $input) = @_[ KERNEL, ARG0 ];
 

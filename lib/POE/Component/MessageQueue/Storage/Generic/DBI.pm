@@ -18,6 +18,8 @@
 package POE::Component::MessageQueue::Storage::Generic::DBI;
 use Moose;
 
+# VERSION
+
 with qw(POE::Component::MessageQueue::Storage::Generic::Base);
 
 use DBI;
@@ -67,7 +69,7 @@ has max_retries => (
 # NOT async!
 sub _clear_claims {
 	my ($self) = @_;
-	
+
 	# Clear all this servers claims
 	my $sql = "UPDATE messages SET in_use_by = NULL";
 	my $mq_id = $self->mq_id;
@@ -95,7 +97,7 @@ around BUILDARGS => sub
 	return $class->$orig(%args);
 };
 
-sub BUILD 
+sub BUILD
 {
 	my ($self, $args) = @_;
 
@@ -198,7 +200,7 @@ sub _wrap_ids
 	$self->_wrap(name => sub {$action->(_make_where($ids))}) if (@$ids > 0);
 }
 
-sub _make_message { 
+sub _make_message {
 	my ($self, $h) = @_;
 	my %map = (
 		id          => 'message_id',
@@ -211,7 +213,7 @@ sub _make_message {
 		deliver_at  => 'deliver_at',
 	);
 	my %args;
-	foreach my $field (keys %map) 
+	foreach my $field (keys %map)
 	{
 		my $val = $h->{$map{$field}};
 		$args{$field} = $val if (defined $val);
@@ -242,20 +244,20 @@ sub store {
 	$self->_wrap(store => sub {
 		my $sth = $self->dbh->prepare(q{
 			INSERT INTO messages (
-				message_id, destination, body, 
-				persistent, in_use_by,  
+				message_id, destination, body,
+				persistent, in_use_by,
 				timestamp,  size,
 				deliver_at
 			) VALUES (
-				?, ?, ?, 
-				?, ?, 
+				?, ?, ?,
+				?, ?,
 				?, ?,
 				?
 			)
 		});
 		$sth->execute(
-			$m->id,         $m->destination, $m->body, 
-			$m->persistent, $self->_in_use_by($m->claimant), 
+			$m->id,         $m->destination, $m->body,
+			$m->persistent, $self->_in_use_by($m->claimant),
 			$m->timestamp,  $m->size,
 			$m->deliver_at
 		);
@@ -460,7 +462,7 @@ POE::Component::MessageQueue::Storage::Generic::DBI -- A storage engine that use
 A storage engine that uses L<DBI>.  All messages stored with this backend are
 persistent.
 
-This module is not itself asynchronous and must be run via 
+This module is not itself asynchronous and must be run via
 L<POE::Component::MessageQueue::Storage::Generic> as shown above.
 
 Rather than using this module "directly" [1], I would suggest wrapping it inside of
@@ -468,7 +470,7 @@ L<POE::Component::MessageQueue::Storage::FileSystem>, to keep the message bodys 
 the filesystem, or L<POE::Component::MessageQueue::Storage::Complex>, which is the
 overall recommended storage engine.
 
-If you are only going to deal with very small messages then, possibly, you could 
+If you are only going to deal with very small messages then, possibly, you could
 safely keep the message body in the database.  However, this is still not really
 recommended for a couple of reasons:
 
@@ -509,12 +511,12 @@ it does best: index and look-up information quickly.
 
 =item servers => ARRAYREF
 
-An ARRAYREF of HASHREFs containing dsn, username, password and options.  Use this when you 
+An ARRAYREF of HASHREFs containing dsn, username, password and options.  Use this when you
 have serveral DB servers and want Storage::DBI to failover when one goes down.
 
 =item mq_id => SCALAR
 
-A string which uniquely identifies this MQ.  This is required when running two MQs which 
+A string which uniquely identifies this MQ.  This is required when running two MQs which
 use the same database.  If they don't have unique mq_id values, than one MQ could inadvertently
 clear the claims set by the other, causing messages to be delivered more than once.
 
@@ -542,7 +544,7 @@ I<Fully Supported>.
 
 =over 4
 
-=item [1] 
+=item [1]
 
 By "directly", I still mean inside of L<POE::Component::MessageQueue::Storage::Generic> because
 that is the only way to use this module.

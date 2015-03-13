@@ -18,6 +18,8 @@
 package POE::Component::MessageQueue::Storage::FileSystem;
 use Moose;
 
+# VERSION
+
 use POE::Kernel;
 use POE::Session;
 use POE::Filter::Stream;
@@ -29,13 +31,13 @@ use constant NotFound => 'FILESYSTEM: Message not on disk';
 
 has 'info_storage' => (
 	is       => 'ro',
-	required => 1,	
+	required => 1,
 	does     => qw(POE::Component::MessageQueue::Storage),
 	handles  => [qw(claim disown_all disown_destination)],
 );
 
 # For all these, we get an aref of stuff that needs bodies from our info
-# store.  So, let's just make them all at once.  
+# store.  So, let's just make them all at once.
 foreach my $method (qw(get get_all)) {
 	__PACKAGE__->meta->add_method($method, sub {
 		my $self = shift;
@@ -63,7 +65,7 @@ foreach my $method (qw(get_oldest claim_and_retrieve)) {
 			$self->_read_loop([$info_answer], [], sub {
 				my $disk_answer = $_[0]->[0];
 
-				if ($disk_answer eq NotFound) 
+				if ($disk_answer eq NotFound)
 				{
 					$self->$method(@args, $callback);
 				}
@@ -122,7 +124,7 @@ after 'set_logger' => sub {
 	$self->info_storage->set_logger($logger);
 };
 
-sub BUILD 
+sub BUILD
 {
 	my $self = shift;
 	$self->children({INFO => $self->info_storage});
@@ -130,7 +132,7 @@ sub BUILD
 		object_states => [
 			$self => [qw(
 				_start                   _stop                 _shutdown
-				_read_message_from_disk  _read_input           _read_error  
+				_read_message_from_disk  _read_input           _read_error
 				_write_message_to_disk   _write_flushed_event
 			)]
 		],
@@ -160,11 +162,11 @@ sub _something_finished_shutting {
 	my $self     = $_[0];
 	my $complete = $self->shutdown_callback;
 
-	if($self->shutdown_waiting) 
+	if($self->shutdown_waiting)
 	{
 		$self->shutdown_waiting(0);
 	}
-	else 
+	else
 	{
 		goto $complete if $complete;
 	}
@@ -177,7 +179,7 @@ sub storage_shutdown
 	# We need to wait for two states: info_storage complete and no wheels.
 	$self->set_shutdown_callback($complete);
 
-	$self->info_storage->storage_shutdown(sub { 
+	$self->info_storage->storage_shutdown(sub {
 		$self->_something_finished_shutting();
 	});
 
@@ -195,7 +197,7 @@ sub store
 	#  (3) We start writing message to disk
 	#
 	# Mark message as needing to be written.
-	# 
+	#
 	# PLD: Also, multiple copies of messages is bad juju.  Delete the body from
 	#      a clone.
 	my $info_copy = $message->clone;
@@ -218,21 +220,21 @@ sub _get_filename
 
 sub _hard_delete
 {
-	my ($self, $id) = @_; 
-	
+	my ($self, $id) = @_;
+
 	# Just unlink it unless there are pending writes
 	return $self->_unlink_file($id) unless delete $self->pending_writes->{$id};
 
 	my $info = $self->file_wheels->{$id};
-	if ($info) 
+	if ($info)
 	{
 		$self->log('debug', "Stopping wheels for message $id (removing)");
 		my $wheel = $info->{write_wheel} || $info->{read_wheel};
 		$wheel->shutdown_input();
 		$wheel->shutdown_output();
 
-		# Mark for deletion: we'll detect this primarly in 
-		# _write_flushed_event and unlink the file at that time 
+		# Mark for deletion: we'll detect this primarly in
+		# _write_flushed_event and unlink the file at that time
 		# (prevents a file descriptor leak)
 		$info->{delete_me} = 1;
 	}
@@ -248,7 +250,7 @@ sub _unlink_file
 	my ($self, $message_id) = @_;
 	my $fn = $self->_get_filename($message_id);
 	$self->log( 'debug', "Deleting $fn" );
-	unlink $fn || 
+	unlink $fn ||
 		$self->log( 'error', "Unable to remove $fn: $!" );
 	return;
 }
@@ -259,8 +261,8 @@ sub _unlink_file
 sub _read_loop
 {
 	my ($self, $to_read, $done_reading, $callback) = @_;
-	my $again = sub { 
-		@_ = ($self, $to_read, $done_reading, $callback); 
+	my $again = sub {
+		@_ = ($self, $to_read, $done_reading, $callback);
 		goto &_read_loop;
 	};
 
@@ -270,7 +272,7 @@ sub _read_loop
 		goto $callback;
 	}
 
-	if (my $body = $self->pending_writes->{$message->id}) 
+	if (my $body = $self->pending_writes->{$message->id})
 	{
 		$message->body($body);
 		push(@$done_reading, $message);
@@ -279,10 +281,10 @@ sub _read_loop
 	else
 	{
 		# Don't have the body anymore, so we'll have to read it from disk.
-		$poe_kernel->post($self->session, 
+		$poe_kernel->post($self->session,
 			_read_message_from_disk => $message->id, sub {
 				my $answer = $_[0];
-				if ($answer eq NotFound) 
+				if ($answer eq NotFound)
 				{
 					push(@$done_reading, $answer);
 				}
@@ -318,10 +320,10 @@ sub empty
 			if ($fn =~ /msg-\(.*\)\.txt/)
 			{
 				my $id = $1;
-				$self->_unlink_file($id) unless exists $self->pending_writes->{$id};	
+				$self->_unlink_file($id) unless exists $self->pending_writes->{$id};
 			}
 		}
-	
+
 		# Do the special dance for deleting those that are pending
 		$self->_hard_delete($_) foreach (keys %{$self->pending_writes});
 		goto $callback if $callback;
@@ -343,7 +345,7 @@ sub _write_message_to_disk
 		));
 		return;
 	}
-	 
+
 	unless ($self->pending_writes->{$message->id})
 	{
 		$self->log('debug', sprintf('Abort write of message %s to disk',
@@ -389,7 +391,7 @@ sub _read_message_from_disk
 
 	my $fn = $self->_get_filename($id);
 	my $fh = IO::File->new( $fn );
-	
+
 	$self->log( 'debug', "Starting to read $fn from disk" );
 
 	# if we can't find the message body.  This usually happens as a result
@@ -404,7 +406,7 @@ sub _read_message_from_disk
 		@_ = (NotFound);
 		goto $callback;
 	}
-	
+
 	# setup the wheel
 	my $wheel = POE::Wheel::ReadWrite->new(
 		Handle       => $fh,
@@ -430,7 +432,7 @@ sub _read_input
 	# a front-store (HA!), and doing empty.
 
 	my $id = $self->wheel_to_message_map->{$wheel_id};
-	$self->file_wheels->{$id}->{accumulator} .= $input;	
+	$self->file_wheels->{$id}->{accumulator} .= $input;
 }
 
 sub _read_error
@@ -453,8 +455,8 @@ sub _read_error
 		delete $self->wheel_to_message_map->{$wheel_id};
 		delete $self->file_wheels->{$id};
 
-		# NOTE:  I have never seen this happen, but it seems theoretically 
-		# possible.  Considering the former problem with leaking FD's, I'd 
+		# NOTE:  I have never seen this happen, but it seems theoretically
+		# possible.  Considering the former problem with leaking FD's, I'd
 		# rather keep this here just in case.
 		$self->_unlink_file($id) if ($info->{delete_me});
 

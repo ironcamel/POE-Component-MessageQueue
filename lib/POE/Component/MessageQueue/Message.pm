@@ -17,6 +17,9 @@
 
 package POE::Component::MessageQueue::Message;
 use Moose;
+
+# VERSION
+
 use Net::Stomp::Frame;
 
 has id => (

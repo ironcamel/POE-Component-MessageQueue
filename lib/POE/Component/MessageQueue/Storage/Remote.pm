@@ -17,6 +17,9 @@
 
 package POE::Component::MessageQueue::Storage::Remote;
 use Moose;
+
+# VERSION
+
 use Data::UUID;
 use POE;
 use POE::Component::Client::TCP;
@@ -46,14 +49,14 @@ sub add_server_method
 	my ($class, $method) = @_;
 	$class->meta->add_method($method, sub {
 		my $self = shift;
-		$poe_kernel->post($self->session_id, remote_call => { 
-			method => $method, 
+		$poe_kernel->post($self->session_id, remote_call => {
+			method => $method,
 			args   => [@_],
 		});
 	});
 }
 
-my %methods = map {$_ => 1} 
+my %methods = map {$_ => 1}
   POE::Component::MessageQueue::Storage->meta->get_required_method_list;
 
 delete $methods{storage_shutdown};
@@ -77,11 +80,11 @@ sub BUILD
 	my $si = 1;
 	my $total_fail = 0;
 	my $retry = sub {
-		if ($si >= @$servers) 
+		if ($si >= @$servers)
 		{
 			if (++$total_fail > 2)
 			{
-				$self->log(emergency => 
+				$self->log(emergency =>
 					"Tried to connect to all servers $total_fail times without success."
 				);
 			}
@@ -102,7 +105,7 @@ sub BUILD
 
 		Connected      => sub {
 			my $heap = $_[HEAP];
-			$heap->{server}->put($_) 
+			$heap->{server}->put($_)
 				foreach map { $_->{request} } (values %{ $heap->{calls} });
 			$total_fail = 0;
 		},

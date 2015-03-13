@@ -18,9 +18,11 @@
 package POE::Component::MessageQueue::Storage::DBI;
 use Moose;
 
+# VERSION
+
 extends qw(POE::Component::MessageQueue::Storage::Generic);
 
-has '+package' => ( 
+has '+package' => (
 	default => 'POE::Component::MessageQueue::Storage::Generic::DBI',
 );
 
@@ -75,7 +77,7 @@ POE::Component::MessageQueue::Storage::DBI -- A storage engine that uses L<DBI>
 A storage engine that uses L<DBI>.  All messages stored with this backend are
 persisted.
 
-Performance is increased greatly by wrapping this engine in 
+Performance is increased greatly by wrapping this engine in
 L<POE::Component::MessageQueue::Storage::Throttled> at the expense of being slower
 to persist messages.
 

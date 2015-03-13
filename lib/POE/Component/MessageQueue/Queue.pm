@@ -16,10 +16,12 @@
 #
 
 package POE::Component::MessageQueue::Queue;
+use Moose;
+
+# VERSION
 
 use POE;
 use POE::Session;
-use Moose;
 
 with qw(POE::Component::MessageQueue::Destination);
 
@@ -46,10 +48,10 @@ sub stash {
 stash 'waiting';
 stash 'serviced';
 
-sub next_subscriber 
+sub next_subscriber
 {
 	my $self = $_[0];
-	if (my @keys = $self->waiting_keys) 
+	if (my @keys = $self->waiting_keys)
 	{
 		my $id = pop(@keys);
 		my $s = $self->del_waiting($id);
@@ -64,7 +66,7 @@ sub next_subscriber
 			return $self->next_subscriber;
 		}
 	}
-	else 
+	else
 	{
 		my $serviced = $self->serviced;
 		$self->serviced($self->waiting);
@@ -112,10 +114,10 @@ sub _start
 		if ($self->parent->pump_frequency);
 }
 
-sub shutdown { 
+sub shutdown {
 	my $self = $_[0];
 	$self->shutting_down(1);
-	$poe_kernel->post($self->name, '_shutdown') 
+	$poe_kernel->post($self->name, '_shutdown')
 }
 
 sub _shutdown
@@ -128,7 +130,7 @@ sub _shutdown
 # This is the pumping philosophy:  When we receive a pump request, we will
 # give everyone a chance to claim a message.  If any pumps are asked for while
 # this is happening, we will remember and do another pump when this one is
-# finished (just one).  
+# finished (just one).
 
 # This means we're serializing claim and retrieve requests.  More work needs
 # to be done to determine whether this is good or necessary.
@@ -211,7 +213,7 @@ sub send
 	{
 		my $mid = $message->id;
 		my $cid = $s->client->id;
-		if ($s->client_ack) 
+		if ($s->client_ack)
 		{
 			$message->claim($cid);
 			$self->log(info => "QUEUE: Message $mid claimed by $cid during send");

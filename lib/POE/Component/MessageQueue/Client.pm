@@ -17,6 +17,9 @@
 
 package POE::Component::MessageQueue::Client;
 use Moose;
+
+# VERSION
+
 use POE::Component::MessageQueue::Subscription;
 use POE::Kernel;
 

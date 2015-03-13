@@ -17,27 +17,30 @@
 
 package POE::Component::MessageQueue::Storage::Generic;
 use Moose;
+
+# VERSION
+
 use POE;
 use POE::Component::Generic 0.1001;
 use POE::Component::MessageQueue::Logger;
 
 # We're going to proxy some methods to the generic object.  Yay MOP!
 my @proxy_methods = qw(
-	get            get_all 
-	get_oldest     claim_and_retrieve 
-	claim          empty          
-	remove         store          
-	disown_all     disown_destination 
+	get            get_all
+	get_oldest     claim_and_retrieve
+	claim          empty
+	remove         store
+	disown_all     disown_destination
 );
 foreach my $method (@proxy_methods)
 {
 	__PACKAGE__->meta->add_method($method, sub {
 		my ($self, @args) = @_;
 		$self->generic->yield(
-			$method, 
+			$method,
 			{session => $self->alias, event => '_general_handler'},
 			@args,
-		);		
+		);
 		return;
 	});
 }
@@ -71,7 +74,7 @@ has options => (
 
 # Because PoCo::Generic needs the constructor options passed to it in this
 # funny way, we have to set up generic in BUILD.
-sub BUILD 
+sub BUILD
 {
 	my $self = $_[0];
 
@@ -82,7 +85,7 @@ sub BUILD
 	);
 
 	$self->generic(POE::Component::Generic->spawn(
-		package        => $self->package, 
+		package        => $self->package,
 		object_options => $self->options,
 		packages       => {
 			$self->package, {
@@ -99,12 +102,12 @@ sub BUILD
 	));
 
 	$self->generic->set_log_function({}, {
-		session => $self->alias, 
+		session => $self->alias,
 		event   => '_log_proxy'
 	});
 
 	use POE::Component::MessageQueue;
-	$self->generic->ignore_signals({}, 
+	$self->generic->ignore_signals({},
 		POE::Component::MessageQueue->SHUTDOWN_SIGNALS);
 };
 
@@ -130,7 +133,7 @@ sub storage_shutdown
 
 	# Send the shutdown message to generic - it will come back when it's cleaned
 	# up its resources, and we can stop it for reals (as well as stop our own
-	# session).  
+	# session).
 	$self->generic->yield('storage_shutdown', {}, sub {
 		$poe_kernel->post($self->alias, '_shutdown', $complete);
 	});

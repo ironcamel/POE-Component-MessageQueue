@@ -17,6 +17,9 @@
 
 package POE::Component::MessageQueue::Storage::Throttled;
 use Moose;
+
+# VERSION
+
 use POE;
 
 with qw(POE::Component::MessageQueue::Storage::Double);
@@ -58,7 +61,7 @@ has shutdown_callback => (
 	predicate => 'shutting_down',
 );
 
-sub BUILD 
+sub BUILD
 {
 	my $self = shift;
 	$self->children({THROTTLED => $self->front, STORAGE => $self->back});

@@ -17,14 +17,17 @@
 
 package POE::Component::MessageQueue::Storage;
 use Moose::Role;
+
+# VERSION
+
 use POE::Component::MessageQueue::Logger;
 
 requires qw(
-	get            get_all 
+	get            get_all
 	get_oldest     claim_and_retrieve
 	claim          store
 	disown_all     disown_destination
-	empty          remove     
+	empty          remove
 	storage_shutdown
 );
 
@@ -53,7 +56,7 @@ sub _areffify
 					goto $cb;
 				}
 			};
-		}	
+		}
 		@_ = @args;
 		goto $original;
 	});
@@ -142,9 +145,9 @@ implement the version that takes an aref, and send arefs to the callbacks.
 =item callbacks
 
 Every storage method has a callback as its last argument.  Callbacks are Plain
-Old Subs. If the method doesn't have some kind of return value, the callback is 
+Old Subs. If the method doesn't have some kind of return value, the callback is
 optional and has no arguments.  It's simply called so you you know the method
-is done.   If the method does have some kind of return value, the 
+is done.   If the method does have some kind of return value, the
 callback is not optional and the argument will be said value.  Return values
 of storage functions are not significant and should never be used.  Unless
 otherwise specified, assume the functions below have plain success callbacks.
@@ -157,13 +160,13 @@ otherwise specified, assume the functions below have plain success callbacks.
 
 =item set_logger I<SCALAR>
 
-Takes an object of type L<POE::Component::MessageQueue::Logger> that should be 
+Takes an object of type L<POE::Component::MessageQueue::Logger> that should be
 used for logging.  This isn't a storage method and does not have any callback
 associated with it.
 
 =item store I<Message>
 
-Takes one or more objects of type L<POE::Component::MessageQueue::Message> 
+Takes one or more objects of type L<POE::Component::MessageQueue::Message>
 that should be stored.
 
 =item get I<optional-aref>
@@ -194,8 +197,8 @@ clients usually want claim_and_retrieve.
 =item claim_and_retrieve I<destination>, I<client-id>
 
 Claims the "next" message intended for I<destination> for I<client-id> and
-passes it to the supplied callback.  Storage engines are free to define what 
-"next" means, but the intended meaning is "oldest unclaimed message for this 
+passes it to the supplied callback.  Storage engines are free to define what
+"next" means, but the intended meaning is "oldest unclaimed message for this
 destination".
 
 =item disown_all I<client-id>

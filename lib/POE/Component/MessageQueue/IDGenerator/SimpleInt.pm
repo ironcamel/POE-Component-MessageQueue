@@ -17,6 +17,9 @@
 
 package POE::Component::MessageQueue::IDGenerator::SimpleInt;
 use Moose;
+
+# VERSION
+
 with qw(POE::Component::MessageQueue::IDGenerator);
 
 has 'filename' => (
@@ -42,10 +45,10 @@ sub BUILD
 	my $self = shift;
 	my $filename = $self->filename;
 
-	if (-e $filename) 
+	if (-e $filename)
 	{
-		open my $in, '<', $filename || 
-			die "Couldn't open $filename for reading: $!";	
+		open my $in, '<', $filename ||
+			die "Couldn't open $filename for reading: $!";
 		my $line = <$in>;
 		close $in;
 		chomp $line;
@@ -61,7 +64,7 @@ sub BUILD
 	}
 }
 
-sub generate 
+sub generate
 {
 	my ($self) = @_;
 	$self->inc_last_id();
@@ -69,7 +72,7 @@ sub generate
 	return "$id";
 }
 
-sub DESTROY 
+sub DESTROY
 {
 	my $self = shift;
 	my $fn = $self->filename;
@@ -90,7 +93,7 @@ POE::Component::MessageQueue::IDGenerator::SimpleInt - Simple integer IDs.
 
 This is a concrete implementation of the Generator interface for creating
 message IDs.  It simply increments an integer, and makes some attempt to
-remember what the last one it used was across runs. 
+remember what the last one it used was across runs.
 
 =head1 AUTHOR
 

@@ -19,6 +19,9 @@
 package POE::Component::MessageQueue::Statistics::Publish;
 use strict;
 use warnings;
+
+# VERSION
+
 use POE;
 use IO::Handle;
 
@@ -47,15 +50,15 @@ sub spawn
 
 				$self->publish();
 
-				$heap->{publish_alarm} = 
+				$heap->{publish_alarm} =
 					$kernel->alarm_set('publish', time() + $self->{interval});
 			},
 			'shutdown' => sub {
 				my ($kernel, $heap) = @_[KERNEL, HEAP];
 				my $alarm = $heap->{publish_alarm};
 				$kernel->alarm_remove($alarm) if $alarm;
-				$self->publish();	
-				# Cut off circular references. 
+				$self->publish();
+				# Cut off circular references.
 				delete @{$self}{qw(statistics session)};
 			},
 		}
@@ -95,7 +98,7 @@ sub shutdown
 {
 	my $self = shift;
 	POE::Kernel->post($self->{session}, 'shutdown');
-} 
+}
 
 1;
 

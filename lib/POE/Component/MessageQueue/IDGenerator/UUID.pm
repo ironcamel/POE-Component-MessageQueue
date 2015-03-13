@@ -17,6 +17,9 @@
 
 package POE::Component::MessageQueue::IDGenerator::UUID;
 use Moose;
+
+# VERSION
+
 with qw(POE::Component::MessageQueue::IDGenerator);
 
 use Data::UUID;
@@ -26,7 +29,7 @@ has 'generator' => (
 	default => sub { Data::UUID->new() },
 );
 
-sub generate 
+sub generate
 {
 	my ($self) = @_;
 	# We could return something more compact (like a b64string) but that would

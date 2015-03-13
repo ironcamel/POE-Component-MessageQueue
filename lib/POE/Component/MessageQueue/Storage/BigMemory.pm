@@ -18,12 +18,14 @@
 package POE::Component::MessageQueue::Storage::BigMemory::MessageElement;
 use base qw(Heap::Elem);
 
+# VERSION
+
 sub new
 {
 	my ($class, $message) = @_;
 	my $self = $class->SUPER::new;
 
-	$self->val($message);	
+	$self->val($message);
 	bless($self, $class);
 }
 
@@ -38,12 +40,14 @@ sub cmp
 package POE::Component::MessageQueue::Storage::BigMemory::DelayedMessageElement;
 use base qw(Heap::Elem);
 
+# VERSION
+
 sub new
 {
 	my ($class, $message) = @_;
 	my $self = $class->SUPER::new;
 
-	$self->val($message);	
+	$self->val($message);
 	bless($self, $class);
 }
 
@@ -57,6 +61,9 @@ sub cmp
 
 package POE::Component::MessageQueue::Storage::BigMemory;
 use Moose;
+
+# VERSION
+
 with qw(POE::Component::MessageQueue::Storage);
 
 use Heap::Fibonacci;
@@ -110,7 +117,7 @@ sub store
 	if ($msg->has_delay && $msg->deliver_at > time())
 	{
 		my $elem = _make_delayed_heap_elem($msg);
-		my $heap = 
+		my $heap =
 			($self->delayed->{$msg->destination} ||= Heap::Fibonacci->new);
 		$heap->add($elem);
 		$info->{delayed} = $elem;
@@ -118,13 +125,13 @@ sub store
 	else
 	{
 		my $elem = _make_heap_elem($msg);
-		if ($msg->claimed) 
+		if ($msg->claimed)
 		{
 			$self->claimed->{$msg->claimant}->{$msg->destination} = $elem;
 		}
 		else
 		{
-			my $heap = 
+			my $heap =
 				($self->unclaimed->{$msg->destination} ||= Heap::Fibonacci->new);
 			$heap->add($elem);
 			$info->{unclaimed} = $elem;
@@ -163,7 +170,7 @@ sub get_oldest
 sub claim_and_retrieve
 {
 	my ($self, $destination, $client_id, $callback) = @_;
-	
+
 	# move delayed messages to normal storage
 	if (my $delayed = $self->delayed->{$destination})
 	{
@@ -184,7 +191,7 @@ sub claim_and_retrieve
 			$elem = _make_heap_elem($msg);
 
 			# add to the unclaimed heap
-			my $unclaimed = 
+			my $unclaimed =
 				($self->unclaimed->{$msg->destination} ||= Heap::Fibonacci->new);
 			$unclaimed->add($elem);
 			$info->{unclaimed} = $elem;
@@ -232,7 +239,7 @@ sub remove
 	goto $callback if $callback;
 }
 
-sub empty 
+sub empty
 {
 	my ($self, $callback) = @_;
 
@@ -251,22 +258,22 @@ sub claim
 		my $info = $self->messages->{$id} || next;
 		my $message = $info->{message};
 		my $destination = $message->destination;
-	
+
 		if ($message->claimed)
 		{
 			# According to the docs, we just Do What We're Told.
-			$self->claimed->{$client_id}->{$destination} = 
+			$self->claimed->{$client_id}->{$destination} =
 				delete $self->claimed->{$message->claimant}->{$destination}
 		}
 		elsif ($info->{delayed})
 		{
-			my $elem = $self->claimed->{$client_id}->{$destination} = 
+			my $elem = $self->claimed->{$client_id}->{$destination} =
 				delete $self->messages->{$message->id}->{delayed};
 			$self->delayed->{$destination}->delete($elem);
 		}
 		elsif ($info->{unclaimed})
 		{
-			my $elem = $self->claimed->{$client_id}->{$destination} = 
+			my $elem = $self->claimed->{$client_id}->{$destination} =
 				delete $self->messages->{$message->id}->{unclaimed};
 			$self->unclaimed->{$destination}->delete($elem);
 		}
@@ -293,7 +300,7 @@ sub disown_destination
 {
 	my ($self, $destination, $client_id, $callback) = @_;
 	my $elem = delete $self->claimed->{$client_id}->{$destination};
-	if ($elem) 
+	if ($elem)
 	{
 		my $message = $elem->val;
 		$message->disown();
@@ -342,7 +349,7 @@ optimized for a large number of messages.
 An in-memory storage engine that is optimised for a large number of messages.
 Its an alternative to L<POE::Componenent::MessageQueue::Storage::Memory>, which
 stores everything in a Perl ARARY, which can slow the MQ to a CRAWL when the
-number of messsages in this store gets big.  
+number of messsages in this store gets big.
 
 store() is a little bit slower per message in this module and it uses
 more memory per message. Everything else should be considerably more efficient,

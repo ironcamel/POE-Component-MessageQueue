@@ -22,6 +22,9 @@ package POE::Component::MessageQueue::Storage::Default;
 
 use strict;
 use warnings;
+
+# VERSION
+
 use POE::Component::MessageQueue::Storage::Throttled;
 use POE::Component::MessageQueue::Storage::DBI;
 use POE::Component::MessageQueue::Storage::FileSystem;
@@ -109,7 +112,7 @@ sub _upgrade
 				"SELECT value FROM meta WHERE key = 'version'"
 			);
 		};
-		# TODO: we need to split the version and pad parts of it with zeros for 
+		# TODO: we need to split the version and pad parts of it with zeros for
 		# an accurate version comparison.
 		return (!$@) && (_expand_version($version) ge _expand_version($check_version));
 	};
@@ -148,12 +151,12 @@ sub _upgrade
 
 			# Dump old table into new table
 			my $columns = q{
-				message_id, destination, persistent, 
+				message_id, destination, persistent,
 				in_use_by,  body, timestamp, size
 			};
 
 			$dbh->do(qq{
-				INSERT INTO messages ( $columns ) 
+				INSERT INTO messages ( $columns )
 				SELECT $columns FROM old_messages
 			});
 
@@ -189,7 +192,7 @@ sub _upgrade
 			# NOTE: Here we *would* change timestamp from INT to DECIMAL(15,5) but
 			# not only is that not possible via SQLite3's ALTER statement, but it makes
 			# no difference what so ever in SQLite3.
-				
+
 			# update the version
 			$dbh->do("UPDATE meta SET value = '0.2.9' where key = 'version'");
 		},
@@ -197,7 +200,7 @@ sub _upgrade
 			# NOTE: Here we *would* change in_use_by from INT to VARCHAR(255) but
 			# not only is that not possible via SQLite3's ALTER statement, but it makes
 			# no difference what so ever in SQLite3.
-				
+
 			# update the version
 			$dbh->do("UPDATE meta SET value = '0.2.10' where key = 'version'");
 		}
@@ -206,10 +209,10 @@ sub _upgrade
 	my $do_repairs = 0;
 	foreach my $ver (@versions)
 	{
-		unless ($do_repairs) 
+		unless ($do_repairs)
 		{
 			my $success = $tests{$ver}->();
-			unless ($success) 
+			unless ($success)
 			{
 				$dbh->begin_work();
 				print STDERR "WARNING: User database is older than $ver.\n";
@@ -240,9 +243,9 @@ sub _make_db
 	my ($file, $dsn, $username, $password) = @_;
 	my $db_exists = (-f $file);
 	my $dbh = DBI->connect(
-		$dsn, 
-		$username, 
-		$password, 
+		$dsn,
+		$username,
+		$password,
 		{ RaiseError => 1 }
 	);
 
@@ -259,7 +262,7 @@ sub _make_db
 	$dbh->disconnect();
 }
 
-sub new 
+sub new
 {
 	my $class = shift;
 	my $args = (@_ > 1 ? {@_} : $_[0]);
@@ -287,7 +290,7 @@ sub new
 		info_storage => $dbi,
 		data_dir     => $data_dir,
 	);
-	
+
 	my $throttled = POE::Component::MessageQueue::Storage::Throttled->new(
 		back         => $fs,
 		throttle_max => $args->{throttle_max} || 2,
@@ -295,7 +298,7 @@ sub new
 
 	# We don't bless anything because we're just returning a Complex...
 	return POE::Component::MessageQueue::Storage::Complex->new(
-		timeout     => $args->{timeout}     || 4,	
+		timeout     => $args->{timeout}     || 4,
 		granularity => $args->{granularity} || 2,
 		front_max   => $args->{front_max}   || 64 * 1024 * 1024,
 		front       => $args->{front}       || $args->{front_store} ||
@@ -338,22 +341,22 @@ POE::Component::MessageQueue::Storage::Default -- The default storage engine (ba
 =head1 DESCRIPTION
 
 This storage engine combines all the other provided engines.  It uses
-L<POE::Component::MessageQueue::Storage::BigMemory> as the front store and 
+L<POE::Component::MessageQueue::Storage::BigMemory> as the front store and
 L<POE::Component::MessageQueue::Storage::FileSystem> as the back store
 for L<POE::Componenet::MessageQueue::Storage::Complex> and provides some other
-sensible and recommended defaults, though you can override them in most cases. 
-Message are initially put into the front-end storage and will be moved into the 
+sensible and recommended defaults, though you can override them in most cases.
+Message are initially put into the front-end storage and will be moved into the
 backend storage after a given number of seconds (defaults to 4).
 
-The L<POE::Component::MessageQueue::Storage::FileSystem> component used 
-internally uses L<POE::Component::MessageQueue::Storage::DBI> with a 
-L<DBD::SQLite> database. It is also throttled via 
+The L<POE::Component::MessageQueue::Storage::FileSystem> component used
+internally uses L<POE::Component::MessageQueue::Storage::DBI> with a
+L<DBD::SQLite> database. It is also throttled via
 L<POE::Component::MessageQueue::Storage::Throttled>.
 
 This is the recommended storage engine.  It should provide the best performance
 while (if configured sanely) still providing a reasonable amount of persistence
-with little risk of eating all your memory under high load.  This is also the 
-only storage backend to correctly honor the persistent flag and will only 
+with little risk of eating all your memory under high load.  This is also the
+only storage backend to correctly honor the persistent flag and will only
 persist those messages with it set.
 
 =head1 CONSTRUCTOR PARAMETERS
@@ -376,8 +379,8 @@ The directory to store the SQLite database file and the message bodies.
 
 =item throttle_max => SCALAR
 
-The max number of messages that can be sent to the DBI store at once.  
-This value is passed directly to the underlying 
+The max number of messages that can be sent to the DBI store at once.
+This value is passed directly to the underlying
 L<POE::Component::MessageQueue::Storage::Throttled>.
 
 =item front_max => SCALAR

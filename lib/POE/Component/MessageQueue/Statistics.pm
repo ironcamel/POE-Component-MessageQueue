@@ -20,6 +20,8 @@ package POE::Component::MessageQueue::Statistics;
 use strict;
 use warnings;
 
+# VERSION
+
 sub new
 {
 	my $class = shift;
@@ -28,7 +30,7 @@ sub new
 			ID => sprintf(
 				"POE::Component::MessageQueue version %s (PID: $$)",
 				# hide from PAUSE
-				eval join('::', '$POE', 'Component', 'MessageQueue', 'VERSION') 
+				eval join('::', '$POE', 'Component', 'MessageQueue', 'VERSION')
 			),
 			total_stored  => 0,
 			total_sent    => 0,
@@ -45,12 +47,12 @@ sub new
 sub register
 {
 	my ($self, $mq) = @_;
-	$mq->register_event( $_, $self ) 
+	$mq->register_event( $_, $self )
 		for qw(store dispatch remove recv subscribe unsubscribe);
 }
 
 sub add_publisher {
-  my ($self, $pub) = @_; 
+  my ($self, $pub) = @_;
   push(@{$self->{publishers}}, $pub);
 }
 
@@ -87,10 +89,10 @@ sub get_topic
 	return $topic;
 }
 
-sub shutdown 
+sub shutdown
 {
 	my $self = shift;
-	foreach my $pub (@{$self->{publishers}}) 
+	foreach my $pub (@{$self->{publishers}})
 	{
 		$pub->shutdown();
 	}
@@ -99,7 +101,7 @@ sub shutdown
 sub notify
 {
 	my ($self, $event, $data) = @_;
-	if(my $method = $self->can("notify_$event")) 
+	if(my $method = $self->can("notify_$event"))
 	{
 		$method->($self, $data);
 	}
@@ -227,7 +229,7 @@ __END__
 
 =head1 NAME
 
-POE::Component::MessageQueue::Statistics - Gather MQ Usage Statistics 
+POE::Component::MessageQueue::Statistics - Gather MQ Usage Statistics
 
 =head1 SYNOPSIS
 

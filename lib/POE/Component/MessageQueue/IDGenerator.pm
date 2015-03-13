@@ -18,6 +18,8 @@
 package POE::Component::MessageQueue::IDGenerator;
 use Moose::Role;
 
+# VERSION
+
 requires qw(generate);
 
 1;
@@ -42,7 +44,7 @@ reading from persistence, or whatnot here.
 
 =item generate => SCALAR
 
-Returns some kind of unique string.  
+Returns some kind of unique string.
 
 =back
 
