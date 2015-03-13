@@ -17,6 +17,7 @@
 
 package POE::Component::Server::Stomp;
 use strict;
+use warnings;
 
 # VERSION
 

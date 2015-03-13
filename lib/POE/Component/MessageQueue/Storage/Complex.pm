@@ -16,6 +16,8 @@
 #
 
 package POE::Component::MessageQueue::Storage::Complex::IdleElement;
+use strict;
+use warnings;
 
 # VERSION
 

@@ -16,6 +16,8 @@
 #
 
 package POE::Component::MessageQueue::Storage::BigMemory::MessageElement;
+use strict;
+use warnings;
 use base qw(Heap::Elem);
 
 # VERSION
@@ -38,6 +40,8 @@ sub cmp
 1;
 
 package POE::Component::MessageQueue::Storage::BigMemory::DelayedMessageElement;
+use strict;
+use warnings;
 use base qw(Heap::Elem);
 
 # VERSION
