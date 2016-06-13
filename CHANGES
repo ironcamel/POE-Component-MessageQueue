@@ -1,4 +1,8 @@
 
+== 0.3003 -- 06/12/2016 ==
+
+ * POSIX::tmpnam is deprecated
+
 == 0.3002 -- 06/07/2015 ==
 
  * Don't start server if we can't connect to db, when using Storage::DBI
