@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Net::EmptyPort qw(empty_port);
 
 BEGIN {
     if ($^O eq 'MSWin32') {
@@ -37,9 +38,10 @@ END {
 	rmtree(DATA_DIR);	
 }
 
+my $port = empty_port();
 my $remote = start_fork(sub {
 	use POE::Component::MessageQueue::Storage::Remote::Server;
-	POE::Component::MessageQueue::Storage::Remote::Server->new(port => 9321);
+	POE::Component::MessageQueue::Storage::Remote::Server->new(port => $port);
 });
 ok($remote, "Remote storage engine started.");
 
@@ -297,7 +299,7 @@ sub engine_loop {
 	mkpath(DATA_DIR);
 	make_db();
 
-	my $storage = make_engine($name);
+	my $storage = make_engine($name, { server_port => $port });
 	my $clones = [values %messages];
 
 	store_loop($storage, $clones, sub {
