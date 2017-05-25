@@ -64,8 +64,8 @@ sub message_is {
 	if(ref $one ne 'POE::Component::MessageQueue::Message') {
 		return diag "message_is called with non-message argument: ".Dump($one);
 	}
-	return ok($one->equals($two), $name) or
-	       diag("got: ", Dump($two), "\nexpected:", Dump($one), "\n");
+	return (ok($one->equals($two), $name) or
+	        diag("got: ", Dump($two), "\nexpected:", Dump($one), "\n"));
 }
 
 sub run_in_order
